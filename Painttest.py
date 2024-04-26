@@ -1,7 +1,6 @@
 import tkinter as tk
 from PIL import Image, ImageTk, ImageGrab
 import os
-import tkinter.colorchooser as colorchooser
 
 root = tk.Tk()
 root.title("Paint")
@@ -106,6 +105,9 @@ def display_image_on_canvas(pil_image):
     canvas.tag_lower("image")
 
 
+
+
+
 displayButton = tk.Button(root, text="Load Images", command=display_all_images)
 displayButton.place(x=700, y=860)
 
@@ -115,7 +117,7 @@ def choosePen():
     global Tool
     print('Pen')
     Tool = 'Pen'
-    slider.config(from_=1, to=15)
+    slider.config(from_=1, to=5)
 
 
 def chooseEraser():
@@ -126,76 +128,39 @@ def chooseEraser():
 
 # ------------------------------------------------------------------------- #
 
-
-
 def chooseBlue():
     global Color
     Color = "Blue"
-    ColBlueButton.config(width=sel_color_button_size, height=sel_color_button_size)
-    reset_color_buttons(ColBlueButton)
 
 def chooseRed():
     global Color
     Color = "Red"
-    ColRedButton.config(width=sel_color_button_size, height=sel_color_button_size)
-    reset_color_buttons(ColRedButton)
 
 def chooseBlack():
     global Color
     Color = "Black"
-    print("black")
-    ColBlackButton.config(width=sel_color_button_size, height=sel_color_button_size)
-    reset_color_buttons(ColBlackButton)
+    print("Black")
 
 def chooseYellow():
     global Color
     Color = "Yellow"
-    ColYellowButton.config(width=sel_color_button_size, height=sel_color_button_size)
-    reset_color_buttons(ColYellowButton)
 
 def chooseGreen():
     global Color
     Color = "Green"
-    ColGreenButton.config(width=sel_color_button_size, height=sel_color_button_size)
-    reset_color_buttons(ColGreenButton)
 
 def chooseOrange():
     global Color
     Color = "Orange"
-    ColOrangeButton.config(width=sel_color_button_size, height=sel_color_button_size)
-    reset_color_buttons(ColOrangeButton)
 
 def choosePink():
     global Color
     Color = "Pink"
-    ColPinkButton.config(width=sel_color_button_size, height=sel_color_button_size)
-    reset_color_buttons(ColPinkButton)
 
 def chooseGray():
     global Color
     Color = "Grey"
-    ColGrayButton.config(width=sel_color_button_size, height=sel_color_button_size)
-    reset_color_buttons(ColGrayButton)
 
-def reset_color_buttons(selected_button):
-    # Reset the size of all color buttons to color_button_size except for the selected button
-    buttons = [ColBlueButton, ColRedButton, ColBlackButton, ColYellowButton,
-            ColGreenButton, ColOrangeButton, ColPinkButton, ColGrayButton]
-    for button in buttons:
-        if button != selected_button:
-            button.config(width=color_button_size, height=color_button_size)
-
-
-def chooseCustomColor():
-    global Color
-    color = colorchooser.askcolor(title="Choose Color")[1]
-    if color:
-        Color = color
-
-        reset_color_buttons(None)
-
-custom_color_button = tk.Button(root, text="Custom Color", command=chooseCustomColor)
-custom_color_button.place(x=20, y=180)
 # ------------------------------------------------------------------------- #
 
 def on_left_click(event):
@@ -211,18 +176,19 @@ def on_left_release(event):
 # ------------------------------------------------------------------------- #
 
 
-def motion(event): 
-    if left_click and Tool == 'Pen':
-        x, y = event.x, event.y
-        prev_x, prev_y = canvas.coords("current_line")[-2:]
-        canvas.create_line(prev_x, prev_y, x, y, fill=Color, width=slider_value, tags="current_line")
-        canvas.coords("current_line", event.x, event.y, event.x, event.y)
-        
-    if left_click and Tool == 'Eraser':
-        x, y = event.x, event.y
-        prev_x, prev_y = canvas.coords("current_line")[-2:]
-        canvas.create_line(prev_x, prev_y, x, y, fill="white", width=slider_value, tags="current_line")
-        canvas.coords("current_line", event.x, event.y, event.x, event.y)
+def motion(event):
+    if left_click and (Tool == 'Pen' or Tool == 'Eraser'):
+        # Check if the "current_line" exists
+        if canvas.find_withtag("current_line"):
+            x, y = event.x, event.y
+            prev_x, prev_y = canvas.coords("current_line")[-2:]
+            if Tool == 'Pen':
+                canvas.create_line(prev_x, prev_y, x, y, fill=Color, width=slider_value, tags="current_line")
+            elif Tool == 'Eraser':
+                canvas.create_line(prev_x, prev_y, x, y, fill="white", width=slider_value, tags="current_line")
+            canvas.coords("current_line", prev_x, prev_y, x, y)
+
+
 
 
 
@@ -255,56 +221,55 @@ styles_text = "STYLES"
 styles_label = tk.Label(root, text=styles_text, bg="white", fg="black", font=("Arial", 22))
 styles_label.place(x=65, y=10)
 
-color_button_size = 30
-sel_color_button_size = 34
+
 
 blue_image = Image.open("blue.png")
 blue_image = blue_image.resize((100,100))
 blue_photo = ImageTk.PhotoImage(blue_image)
-ColBlueButton = tk.Button(root, image=blue_photo, command=chooseBlue, width=color_button_size, height=color_button_size, )
+ColBlueButton = tk.Button(root, image=blue_photo, command=chooseBlue, width=30, height=30, )
 ColBlueButton.place(x=20, y=80)
 
 
 red_image = Image.open("red.png")
 red_image = red_image.resize((100,100))
 red_photo = ImageTk.PhotoImage(red_image)
-ColRedButton = tk.Button(root, image=red_photo, command=chooseRed, width=color_button_size, height=color_button_size, )
+ColRedButton = tk.Button(root, image=red_photo, command=chooseRed, width=30, height=30, )
 ColRedButton.place(x=70, y=80)
 
 yellow_image = Image.open("yellow.png")
 yellow_image = yellow_image.resize((100,100))
 yellow_photo = ImageTk.PhotoImage(yellow_image)
-ColYellowButton = tk.Button(root, image=yellow_photo, command=chooseYellow, width=color_button_size, height=color_button_size, )
+ColYellowButton = tk.Button(root, image=yellow_photo, command=chooseYellow, width=30, height=30, )
 ColYellowButton.place(x=120, y=80)
 
 black_image = Image.open("black.webp")
 black_image = black_image.resize((100,100))
 black_photo = ImageTk.PhotoImage(black_image)
-ColBlackButton = tk.Button(root, image=black_photo, command=chooseBlack, width=color_button_size, height=color_button_size, )
+ColBlackButton = tk.Button(root, image=black_photo, command=chooseBlack, width=30, height=30, )
 ColBlackButton.place(x=170, y=80)
 
 green_image = Image.open("Green.png")
 green_image = green_image.resize((100, 100))
 green_photo = ImageTk.PhotoImage(green_image)
-ColGreenButton = tk.Button(root, image=green_photo, command=chooseGreen, width=color_button_size, height=color_button_size)
+ColGreenButton = tk.Button(root, image=green_photo, command=chooseGreen, width=30, height=30)
 ColGreenButton.place(x=20, y=130)
 
 orange_image = Image.open("Orange.png")
 orange_image = orange_image.resize((100, 100))
 orange_photo = ImageTk.PhotoImage(orange_image)
-ColOrangeButton = tk.Button(root, image=orange_photo, command=chooseOrange, width=color_button_size, height=color_button_size)
+ColOrangeButton = tk.Button(root, image=orange_photo, command=chooseOrange, width=30, height=30)
 ColOrangeButton.place(x=70, y=130)
 
 pink_image = Image.open("Pink.jpeg")
 pink_image = pink_image.resize((100, 100))
 pink_photo = ImageTk.PhotoImage(pink_image)
-ColPinkButton = tk.Button(root, image=pink_photo, command=choosePink, width=color_button_size, height=color_button_size)
+ColPinkButton = tk.Button(root, image=pink_photo, command=choosePink, width=30, height=30)
 ColPinkButton.place(x=120, y=130)
 
 gray_image = Image.open("Gray.png")
 gray_image = gray_image.resize((100, 100))
 gray_photo = ImageTk.PhotoImage(gray_image)
-ColGrayButton = tk.Button(root, image=gray_photo, command=chooseGray, width=color_button_size, height=color_button_size)
+ColGrayButton = tk.Button(root, image=gray_photo, command=chooseGray, width=30, height=30)
 ColGrayButton.place(x=170, y=130)
 
 # ------------------------------------------------------------------------- #
@@ -323,7 +288,7 @@ canvas.create_rectangle(0, 0, 1, 1, fill="black", width=2, tags="current_line")
 slider_text = "CHANGE TOOL SIZE"
 slider_label = tk.Label(root, text=slider_text, bg="white", fg="black", font=("Arial", 17))
 slider_label.place(x=2, y=753)
-slider = tk.Scale(root, from_=1, to=15, orient=tk.HORIZONTAL, length=165, command=update_slider)
+slider = tk.Scale(root, from_=1, to=10, orient=tk.HORIZONTAL, length=165, command=update_slider)
 slider.place(x=3, y=775)
 
 # ------------------------------------------------------------------------- #
