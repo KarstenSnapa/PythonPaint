@@ -124,6 +124,15 @@ def chooseEraser():
     Tool = 'Eraser'
     slider.config(from_=10, to=100)
 
+
+def chooseCircle():
+    global Tool
+    print('Circle')
+    Tool = 'Circle'
+    slider.config(from_=20, to=200)
+
+
+
 # ------------------------------------------------------------------------- #
 
 
@@ -204,6 +213,7 @@ def on_left_click(event):
     # Initialize the starting point of the line at the current mouse position
     canvas.coords("current_line", event.x, event.y, event.x, event.y)
 
+
 def on_left_release(event):
     global left_click
     left_click = False
@@ -212,18 +222,23 @@ def on_left_release(event):
 
 
 def motion(event): 
-    if left_click and Tool == 'Pen':
+    if left_click and Tool == 'Circle':
         x, y = event.x, event.y
-        prev_x, prev_y = canvas.coords("current_line")[-2:]
-        canvas.create_line(prev_x, prev_y, x, y, fill=Color, width=slider_value, tags="current_line")
-        canvas.coords("current_line", event.x, event.y, event.x, event.y)
+        radius = slider_value // 2  
+        canvas.create_oval(x - radius, y - radius, x + radius, y + radius, fill=Color, outline=Color, width=0)  
+
         
     if left_click and Tool == 'Eraser':
         x, y = event.x, event.y
         prev_x, prev_y = canvas.coords("current_line")[-2:]
         canvas.create_line(prev_x, prev_y, x, y, fill="white", width=slider_value, tags="current_line")
         canvas.coords("current_line", event.x, event.y, event.x, event.y)
-
+    
+    elif left_click and Tool == 'Pen':
+        x, y = event.x, event.y
+        prev_x, prev_y = canvas.coords("current_line")[-2:]
+        canvas.create_line(prev_x, prev_y, x, y, fill=Color, width=slider_value, tags="current_line")
+        canvas.coords("current_line", event.x, event.y, event.x, event.y)
 
 
 # ------------------------------------------------------------------------- #
@@ -248,6 +263,14 @@ eraser_image = eraser_image.resize((80, 60))
 eraser_photo = ImageTk.PhotoImage(eraser_image)
 EraserButton = tk.Button(root, image=eraser_photo, command=chooseEraser, width=80, height=60, relief=tk.RAISED, borderwidth=0)
 EraserButton.place(x=89, y=833)
+
+# ------------------------------------------------------------------------- #
+
+circle_image = Image.open("circle.png")
+circle_image = circle_image.resize((80, 60))
+circle_photo = ImageTk.PhotoImage(circle_image)
+CircleButton = tk.Button(root, image=circle_photo, command=chooseCircle, width=60, height=60, relief=tk.RAISED, borderwidth=0)
+CircleButton.place(x=3, y=680)
 
 # ------------------------------------------------------------------------- #
 
